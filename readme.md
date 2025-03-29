@@ -5,6 +5,10 @@ The AI Research Assistant R2 🔎🌏 with Thinking Process 🧠 (Deep Research 
 
 You need to provide a research topic and configure their Azure OpenAI API settings in the sidebar. The AI Agent generates search queries, retrieves information from the web using SerpAPI, and summarizes the findings. It iteratively critiques the summary, identifies gaps, and generates new queries to refine the research until it reaches a comprehensive conclusion or the user-defined iteration limit. Throughout the process, the program transparently displays its thinking steps, including search queries, summaries, critiques, and updates, culminating in a detailed final report.
 
+To make it easier for everyone to try, I’ve published the app on Streamlit Community Cloud!
+
+🌏: https://deepresearchminionr2.streamlit.app/
+
 ## Features
 - Streamlit-based user interface for easy interaction.
 - Iterative research process that includes generating search queries, summarizing results, and critiquing findings.
@@ -44,5 +48,6 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 ## Acknowledgements
 
 - [Streamlit](https://streamlit.io/)
+- [LangChain](https://www.langchain.com/)
 - [Azure OpenAI](https://azure.microsoft.com/en-us/products/ai-services/openai-service/)
 - [SerpAPI](https://serpapi.com/)
