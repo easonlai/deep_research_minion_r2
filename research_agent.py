@@ -30,24 +30,33 @@ user_openai_api_version = st.sidebar.text_input(
 )
 
 # Sidebar: User Input for SerpAPI Key
+st.sidebar.header("SerpAPI Configuration")
 user_serpapi_key = st.sidebar.text_input(
     "SerpAPI Key", value="", type="password", help="Enter your SerpAPI Key for web searches."
 )
 
 # Validate API Configuration
-if not all([user_openai_api_key, user_azure_endpoint, user_azure_deployment, user_openai_api_version, user_serpapi_key]):
-    st.sidebar.error("Please provide all required API configuration details, including the SerpAPI Key.")
+if not all([user_openai_api_key, user_azure_endpoint, user_azure_deployment, user_openai_api_version]):
+    st.sidebar.error("Please provide all required Azure OpenAI API configuration details.")
+if not user_serpapi_key:
+    st.sidebar.error("Please provide your SerpAPI Key.")
 
-# Initialize AzureChatOpenAI and SerpAPI
-llm = AzureChatOpenAI(
-    openai_api_key=user_openai_api_key,
-    azure_endpoint=user_azure_endpoint,
-    azure_deployment=user_azure_deployment,
-    openai_api_type="azure",
-    openai_api_version=user_openai_api_version,
-    temperature=0
-)
-search = SerpAPIWrapper(serpapi_api_key=user_serpapi_key)
+# Initialize AzureChatOpenAI and SerpAPI only if all configurations are provided
+llm = None
+search = None
+if all([user_openai_api_key, user_azure_endpoint, user_azure_deployment, user_openai_api_version, user_serpapi_key]):
+    try:
+        llm = AzureChatOpenAI(
+            openai_api_key=user_openai_api_key,
+            azure_endpoint=user_azure_endpoint,
+            azure_deployment=user_azure_deployment,
+            openai_api_type="azure",
+            openai_api_version=user_openai_api_version,
+            temperature=0
+        )
+        search = SerpAPIWrapper(serpapi_api_key=user_serpapi_key)
+    except Exception as e:
+        st.error(f"Failed to initialize Azure OpenAI or SerpAPI: {e}")
 
 # Define Prompt Templates
 def create_prompt_templates():
@@ -76,12 +85,13 @@ def create_prompt_templates():
 
 templates = create_prompt_templates()
 
-# Build Chains
-query_chain = templates["query"] | llm
-summary_chain = templates["summary"] | llm
-critique_chain = templates["critique"] | llm
-new_queries_chain = templates["new_queries"] | llm
-update_summary_chain = templates["update_summary"] | llm
+# Build Chains only if llm is initialized
+if llm:
+    query_chain = templates["query"] | llm
+    summary_chain = templates["summary"] | llm
+    critique_chain = templates["critique"] | llm
+    new_queries_chain = templates["new_queries"] | llm
+    update_summary_chain = templates["update_summary"] | llm
 
 # User Inputs for Research
 query = st.text_input("Research Topic:", "Impact of AI on healthcare")
@@ -89,9 +99,10 @@ max_iterations = st.slider("Maximum Iterations", 1, 5, 3, help="Set the maximum 
 
 # Research Process Trigger
 if st.button("Start Research"):
-    # Ensure SerpAPI Key is provided
-    if not user_serpapi_key:
-        st.error("Please provide a valid SerpAPI Key in the sidebar to proceed.")
+    if not all([user_openai_api_key, user_azure_endpoint, user_azure_deployment, user_openai_api_version, user_serpapi_key]):
+        st.error("Please provide all required API configuration details before starting the research.")
+    elif not llm or not search:
+        st.error("Failed to initialize the required services. Please check your API configurations.")
     else:
         # Initialize a cache for search results to avoid redundant API calls
         search_cache = {}
