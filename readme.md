@@ -16,7 +16,7 @@ To set up the project, follow these steps:
 
 1. Clone the repository:
    ```
-   git clone <repository-url>
+   git clone https://github.com/easonlai/deep_research_minion_r2
    cd deep_research_minion_r2
    ```
 
@@ -30,7 +30,7 @@ To set up the project, follow these steps:
 ## Usage
 To run the application, execute the following command in your terminal:
 ```
-streamlit run src/research_agent.py
+streamlit run research_agent.py
 ```
 
 Once the application is running, you can enter a research topic, configure your API settings, and start the research process. The AI will guide you through generating queries, summarizing results, and refining your research iteratively.
